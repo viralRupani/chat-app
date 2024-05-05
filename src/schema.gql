@@ -1,0 +1,64 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input ActivateAccountInput {
+  email: String!
+  otp: String!
+  otp_type: otp_type_enum!
+}
+
+input ChangePasswordInput {
+  new_password: String!
+  password: String!
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+type GenericResult {
+  message: String!
+}
+
+type LoginOutput {
+  access_token: String!
+  message: String!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  activateAccount(object: ActivateAccountInput!): GenericResult!
+  changePassword(object: ChangePasswordInput!): GenericResult!
+  forgotPassword(object: ForgotPasswordInput!): GenericResult!
+  register(object: RegisterUserInput!): GenericResult!
+  resetPassword(object: ResetPasswordInput!): GenericResult!
+}
+
+type Query {
+  findUser: String!
+  login(object: LoginUserInput!): LoginOutput!
+}
+
+input RegisterUserInput {
+  about: String!
+  email: String!
+  name: String!
+  password: String!
+  phone: String!
+}
+
+input ResetPasswordInput {
+  email: String!
+  otp: String!
+  password: String!
+}
+
+enum otp_type_enum {
+  forgot_password
+  register_user
+}
