@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { RegisterUserInput } from './dto/register-user.input';
 import { User } from 'src/users/entities/user.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Message } from 'src/common/constants';
 import { UsersService } from 'src/users/users.service';
@@ -19,6 +19,8 @@ import { ChangePasswordInput } from './dto/change-password.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
 import { otp_type_enum } from 'src/common/enums';
 import { ActivateAccountInput } from './dto/activate-account.input';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +28,10 @@ export class AuthService {
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private readonly dataSource: DataSource,
+        private readonly config: ConfigService,
+
+        @InjectRepository(User)
+        private readonly userRepo: Repository<User>,
     ) {}
 
     async validateUser(email: string, password: string) {
@@ -59,10 +65,13 @@ export class AuthService {
             )
         )[0];
 
-        registerUserInput.password = await bcrypt.hash(password, 10); //todo: remove constant 10
+        registerUserInput.password = await bcrypt.hash(
+            password,
+            this.config.get('bcrypt.hash'),
+        );
 
         if (!foundUser || !foundUser.is_verified) {
-            await this.dataSource
+            await this.userRepo
                 .createQueryBuilder()
                 .insert()
                 .into(User)
@@ -126,7 +135,10 @@ export class AuthService {
             throw new UnauthorizedException(Message.WRONG_PASS);
         }
 
-        const hash: string = await bcrypt.hash(new_password, 10);
+        const hash: string = await bcrypt.hash(
+            new_password,
+            this.config.get('bcrypt.hash'),
+        );
 
         await this.dataSource.query(
             `

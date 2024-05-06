@@ -3,25 +3,22 @@ import { EmailService } from './email.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { join } from 'path';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
     imports: [
         MailerModule.forRootAsync({
-            useFactory: () => ({
-                transport: {
-                    port: 587,
-                    host: 'smtp.gmail.com',
-                    from: 'viralrupani12017@gmail.com',
-                    auth: {
-                        user: 'viralrupani12017@gmail.com',
-                        pass: 'fhth ghsa egbs egoj',
+            inject: [ConfigService],
+            imports: [ConfigModule],
+            useFactory: (config: ConfigService) => {
+                return {
+                    transport: config.get('mail'),
+                    template: {
+                        dir: join(__dirname, 'templates/'),
+                        adapter: new EjsAdapter(),
                     },
-                },
-                template: {
-                    dir: join(__dirname, 'templates/'),
-                    adapter: new EjsAdapter(),
-                },
-            }),
+                };
+            },
         }),
     ],
     providers: [EmailService],
