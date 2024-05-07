@@ -27,4 +27,8 @@ export default () => ({
     bcrypt: {
         hash: +process.env.B_HASH,
     },
+    jwt: {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_EXPIRE_TIME,
+    },
 });
