@@ -21,6 +21,8 @@ import { otp_type_enum } from 'src/common/enums';
 import { ActivateAccountInput } from './dto/activate-account.input';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HttpService } from '@nestjs/axios';
+import { catchError, firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +31,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly dataSource: DataSource,
         private readonly config: ConfigService,
+        private readonly httpService: HttpService,
 
         @InjectRepository(User)
         private readonly userRepo: Repository<User>,
@@ -54,6 +57,14 @@ export class AuthService {
 
     async register(registerUserInput: RegisterUserInput): Promise<void> {
         const { email, password } = registerUserInput;
+
+        await firstValueFrom(
+            this.httpService.get(`https://${email.split('@')[1]}`).pipe(
+                catchError(() => {
+                    throw new BadRequestException(Message.INVALID_EMAIL);
+                }),
+            ),
+        );
 
         const foundUser: User = (
             await this.dataSource.query(

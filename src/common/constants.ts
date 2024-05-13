@@ -10,4 +10,5 @@ export enum Message {
     SAME_PASSWORD = 'Passwords can not be same',
     PASS_CHANGED = 'Password changed successfully',
     WRONG_PASS = 'Wrong password',
+    INVALID_EMAIL = 'Invalid Email!',
 }
