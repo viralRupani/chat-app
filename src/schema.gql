@@ -13,6 +13,14 @@ input ChangePasswordInput {
   password: String!
 }
 
+input CreateChatInput {
+  chat_type: chat_type_enum!
+  description: String
+  members: [Int!]!
+  name: String!
+  profile: String!
+}
+
 input ForgotPasswordInput {
   email: String!
 }
@@ -34,6 +42,7 @@ input LoginUserInput {
 type Mutation {
   activateAccount(object: ActivateAccountInput!): GenericResult!
   changePassword(object: ChangePasswordInput!): GenericResult!
+  createChat(object: CreateChatInput!): String!
   forgotPassword(object: ForgotPasswordInput!): GenericResult!
   register(object: RegisterUserInput!): GenericResult!
   resetPassword(object: ResetPasswordInput!): GenericResult!
@@ -56,6 +65,11 @@ input ResetPasswordInput {
   email: String!
   otp: String!
   password: String!
+}
+
+enum chat_type_enum {
+  direct_message
+  group
 }
 
 enum otp_type_enum {
