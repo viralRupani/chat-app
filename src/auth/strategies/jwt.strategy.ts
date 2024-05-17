@@ -27,6 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         try {
             await this.userRepo.findOneByOrFail({
                 email: payload?.email,
+                deleted_at: null,
             });
             return payload;
         } catch (error) {
