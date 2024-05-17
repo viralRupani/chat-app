@@ -11,4 +11,6 @@ export enum Message {
     PASS_CHANGED = 'Password changed successfully',
     WRONG_PASS = 'Wrong password',
     INVALID_EMAIL = 'Invalid Email!',
+    CHAT_CREATED = 'Chat created successfully',
+    SOMETHING_WENT_WRONG = 'SOMETHING_WENT_WRONG',
 }

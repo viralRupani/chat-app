@@ -2,14 +2,21 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { CommonEntity } from 'src/common/common-entities/common.entity';
 import { chat_type_enum } from 'src/common/enums';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ChatUserMapping } from './chat_user_mapping.entity';
 
 @Entity()
 @ObjectType()
 export class Chat extends CommonEntity {
     @PrimaryGeneratedColumn()
     @Field()
-    id: number;
+    id?: number;
 
     @Column({ type: 'varchar', length: 50 })
     @Field()
@@ -33,4 +40,7 @@ export class Chat extends CommonEntity {
 
     @ManyToOne(() => User)
     created_by: User;
+
+    @OneToMany(() => ChatUserMapping, (chatUserMapping) => chatUserMapping.chat)
+    chat_user_mapping: ChatUserMapping[];
 }

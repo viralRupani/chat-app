@@ -42,7 +42,7 @@ input LoginUserInput {
 type Mutation {
   activateAccount(object: ActivateAccountInput!): GenericResult!
   changePassword(object: ChangePasswordInput!): GenericResult!
-  createChat(object: CreateChatInput!): String!
+  createChat(object: CreateChatInput!): GenericResult!
   forgotPassword(object: ForgotPasswordInput!): GenericResult!
   register(object: RegisterUserInput!): GenericResult!
   resetPassword(object: ResetPasswordInput!): GenericResult!

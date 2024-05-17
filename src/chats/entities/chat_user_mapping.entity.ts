@@ -5,20 +5,24 @@ import { role_type_enum } from 'src/common/enums';
 import { CommonEntity } from 'src/common/common-entities/common.entity';
 
 @Entity()
-export class chatUserMapping extends CommonEntity {
+export class ChatUserMapping extends CommonEntity {
     @PrimaryColumn()
     user_id: number;
 
     @PrimaryColumn()
     chat_id: number;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, {
+        onDelete: 'CASCADE',
+    })
     @JoinColumn({ name: 'user_id' })
-    user: User;
+    user?: User;
 
-    @ManyToOne(() => Chat)
+    @ManyToOne(() => Chat, (chat) => chat.chat_user_mapping, {
+        onDelete: 'CASCADE',
+    })
     @JoinColumn({ name: 'chat_id' })
-    chat: Chat;
+    chat?: Chat;
 
     @Column({
         type: 'enum',
