@@ -15,8 +15,11 @@ export class ChatsResolver {
     constructor(private readonly chatsService: ChatsService) {}
 
     @Query(() => GetChatOutput)
-    async getChats(@Args('object') getChatInput: GetChatInput) {
-        return await this.chatsService.getChats(getChatInput);
+    async getChats(
+        @Args('object') getChatInput: GetChatInput,
+        @CurrentUser() user: IPayload,
+    ) {
+        return await this.chatsService.getChats(getChatInput, user);
     }
 
     @Mutation(() => GenericResult)
@@ -34,12 +37,16 @@ export class ChatsResolver {
     @Mutation(() => GenericResult)
     async updateChat(
         @Args('object') updateChatInput: UpdateChatInput,
+        @CurrentUser() user: IPayload,
     ): Promise<GenericResult> {
-        return await this.chatsService.updateChat(updateChatInput);
+        return await this.chatsService.updateChat(updateChatInput, user);
     }
 
     @Mutation(() => GenericResult)
-    async deleteChat(@Args('object') deleteChatInput: DeleteChatInput) {
-        return await this.chatsService.deleteChat(deleteChatInput);
+    async deleteChat(
+        @Args('object') deleteChatInput: DeleteChatInput,
+        @CurrentUser() user: IPayload,
+    ) {
+        return await this.chatsService.deleteChat(deleteChatInput, user);
     }
 }

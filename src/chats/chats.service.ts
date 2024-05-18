@@ -1,5 +1,6 @@
 import {
     BadRequestException,
+    ForbiddenException,
     Injectable,
     InternalServerErrorException,
 } from '@nestjs/common';
@@ -21,7 +22,10 @@ import { GetChatOutput } from './dto/get-chat.output';
 export class ChatsService {
     constructor(private readonly dataSource: DataSource) {}
 
-    async getChats(getChatInput: GetChatInput): Promise<GetChatOutput> {
+    async getChats(
+        getChatInput: GetChatInput,
+        user: IPayload,
+    ): Promise<GetChatOutput> {
         const { offset, limit, where } = getChatInput;
 
         const queryBuilder = this.dataSource
@@ -29,28 +33,32 @@ export class ChatsService {
             .createQueryBuilder('chat')
             .offset(offset)
             .limit(limit)
-            .where('deleted_at IS NULL');
+            .andWhere('chat.deleted_at IS NULL');
 
         if (where) {
             const { id, name } = where;
             if (id) {
                 const { _eq } = id;
                 if (_eq) {
-                    queryBuilder.andWhere('id = :id', { id: _eq });
+                    queryBuilder.andWhere('chat.id = :id', { id: _eq });
                 }
             }
 
             if (name) {
                 const { _eq, _ilike } = name;
                 if (_eq) {
-                    queryBuilder.andWhere('name = :name', { name: _eq });
+                    queryBuilder.andWhere('chat.name = :name', { name: _eq });
                 } else if (_ilike) {
-                    queryBuilder.andWhere('name ILIKE :name', {
+                    queryBuilder.andWhere('chat.name ILIKE :name', {
                         name: _ilike,
                     });
                 }
             }
         }
+
+        queryBuilder
+            .leftJoin('chat.chat_user_mapping', 'cum')
+            .andWhere('cum.user_id = :user_id', { user_id: user.sub });
 
         const [chats, count] = await queryBuilder.getManyAndCount();
 
@@ -120,15 +128,33 @@ export class ChatsService {
         }
     }
 
-    async updateChat(updateChatInput: UpdateChatInput): Promise<GenericResult> {
+    async updateChat(
+        updateChatInput: UpdateChatInput,
+        user: IPayload,
+    ): Promise<GenericResult> {
         const { id, ...rest } = updateChatInput;
+
+        const isAuthorized = await this.dataSource.query(
+            `
+        SELECT 1
+        FROM chat_user_mapping
+        WHERE user_id = $1
+        AND chat_id = $2
+        AND role = 'admin'
+        AND deleted_at IS NULL;
+        `,
+            [user.sub, id],
+        );
+
+        if (isAuthorized.length === 0) {
+            throw new ForbiddenException(Message.UNAUTHORIZED_OPERATION);
+        }
 
         await this.dataSource
             .createQueryBuilder()
             .update(Chat)
             .set({ ...rest, updated_at: new Date() } as Chat)
             .where('id = :id', { id })
-            .andWhere('deleted_at IS NULL')
             .execute();
 
         return {
@@ -136,14 +162,37 @@ export class ChatsService {
         };
     }
 
-    async deleteChat({ id }: DeleteChatInput): Promise<GenericResult> {
+    async deleteChat(
+        { id }: DeleteChatInput,
+        user: IPayload,
+    ): Promise<GenericResult> {
+        const isAuthorized = await this.dataSource.query(
+            `
+        SELECT 1
+        FROM chat_user_mapping
+        WHERE user_id = $1
+        AND chat_id = $2
+        AND role = 'admin'
+        AND deleted_at IS NULL;
+    `,
+            [user.sub, id],
+        );
+
+        if (isAuthorized.length === 0) {
+            throw new ForbiddenException(Message.UNAUTHORIZED_OPERATION);
+        }
+
         await this.dataSource.query(
             `
-        UPDATE chat
-        SET deleted_at = $1
-        WHERE id = $2 AND deleted_at IS NULL
+                UPDATE
+                    chat c
+                SET
+                    deleted_at = NOW()
+                WHERE
+                    c.id = $1
+                    AND c.deleted_at IS NULL;
         `,
-            [new Date(), id],
+            [id],
         );
 
         return {

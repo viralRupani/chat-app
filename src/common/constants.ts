@@ -15,4 +15,5 @@ export enum Message {
     SOMETHING_WENT_WRONG = 'Something went wrong',
     CHAT_UPDATED = 'Chat updated successfully',
     CHAT_DELETED = 'Chat Deleted successfully',
+    UNAUTHORIZED_OPERATION = 'You are unauthorized to perform this operation',
 }
