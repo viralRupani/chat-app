@@ -6,7 +6,7 @@ import { GenericResult } from 'src/common/generic-result.output';
 import { Message } from 'src/common/constants';
 import { OtpService } from 'src/otp/otp.service';
 import { mail_subject_enum, otp_type_enum } from 'src/common/enums';
-import { UseGuards } from '@nestjs/common';
+import { BadRequestException, UseGuards } from '@nestjs/common';
 import { LoginUserInput } from './dto/login-user.input';
 import { LocalAuthGuard } from 'src/common/guards/local-auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -56,12 +56,14 @@ export class AuthResolver {
             otp_type: otp_type_enum.register_user,
         });
 
-        isVerified &&
-            (await this.authService.activateAccount(activateAccountInput));
-
-        return {
-            message: Message.OTP_VERIFIED,
-        };
+        if (isVerified) {
+            await this.authService.activateAccount(activateAccountInput);
+            return {
+                message: Message.OTP_VERIFIED,
+            };
+        } else {
+            throw new BadRequestException(Message.INVALID_OTP);
+        }
     }
 
     @SkipAuth()
@@ -112,10 +114,13 @@ export class AuthResolver {
             otp: resetPasswordInput.otp,
             otp_type: otp_type_enum.forgot_password,
         });
-        isVerified &&
-            (await this.authService.resetPassword(resetPasswordInput));
-        return {
-            message: Message.PASS_CHANGED,
-        };
+        if (isVerified) {
+            await this.authService.resetPassword(resetPasswordInput);
+            return {
+                message: Message.PASS_CHANGED,
+            };
+        } else {
+            throw new BadRequestException(Message.INVALID_OTP);
+        }
     }
 }

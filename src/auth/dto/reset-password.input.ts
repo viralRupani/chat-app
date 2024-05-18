@@ -1,9 +1,12 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { LoginUserInput } from './login-user.input';
+import { Field, InputType, PickType } from '@nestjs/graphql';
 import { Length } from 'class-validator';
+import { RegisterUserInput } from './register-user.input';
 
 @InputType()
-export class ResetPasswordInput extends LoginUserInput {
+export class ResetPasswordInput extends PickType(RegisterUserInput, [
+    'password',
+    'email',
+] as const) {
     @Field()
     @Length(8, 8)
     otp: string;

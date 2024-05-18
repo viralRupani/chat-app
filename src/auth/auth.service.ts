@@ -17,7 +17,6 @@ import { IPayload } from './auth.interfaces';
 import { GenericResult } from 'src/common/generic-result.output';
 import { ChangePasswordInput } from './dto/change-password.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
-import { otp_type_enum } from 'src/common/enums';
 import { ActivateAccountInput } from './dto/activate-account.input';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -70,18 +69,18 @@ export class AuthService {
             await this.dataSource.query(
                 `
             SELECT * FROM "user"
-            WHERE "user"."email" = $1
+            WHERE "user"."email" = $1 AND "user"."is_verified" = $2
         `,
-                [email],
+                [email, true],
             )
         )[0];
 
-        registerUserInput.password = await bcrypt.hash(
-            password,
-            this.config.get('bcrypt.hash'),
-        );
+        if (!foundUser) {
+            registerUserInput.password = await bcrypt.hash(
+                password,
+                this.config.get('bcrypt.hash'),
+            );
 
-        if (!foundUser || !foundUser.is_verified) {
             await this.userRepo
                 .createQueryBuilder()
                 .insert()
@@ -89,7 +88,7 @@ export class AuthService {
                 .values({ created_at: new Date(), ...registerUserInput })
                 .orUpdate(['name', 'password', 'about', 'phone'], ['email'])
                 .execute();
-        } else if (foundUser.is_verified) {
+        } else {
             throw new ConflictException(Message.USER_ALREADY_EXIST);
         }
     }
@@ -99,12 +98,10 @@ export class AuthService {
         otp_type,
     }: ActivateAccountInput): Promise<void> {
         await this.dataSource.transaction(async (entityManager) => {
-            if (otp_type === otp_type_enum.register_user) {
-                await entityManager.query(
-                    'UPDATE "user" SET is_verified = $1 WHERE email = $2',
-                    [true, email],
-                );
-            }
+            await entityManager.query(
+                'UPDATE "user" SET is_verified = $1 WHERE email = $2',
+                [true, email],
+            );
             await entityManager.query(
                 `
                 DELETE FROM
