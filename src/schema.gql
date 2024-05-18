@@ -5,7 +5,6 @@
 input ActivateAccountInput {
   email: String!
   otp: String!
-  otp_type: otp_type_enum!
 }
 
 input ChangePasswordInput {
@@ -70,9 +69,4 @@ input ResetPasswordInput {
 enum chat_type_enum {
   direct_message
   group
-}
-
-enum otp_type_enum {
-  forgot_password
-  register_user
 }

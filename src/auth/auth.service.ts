@@ -22,6 +22,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
+import { otp_type_enum } from 'src/common/enums';
 
 @Injectable()
 export class AuthService {
@@ -93,10 +94,7 @@ export class AuthService {
         }
     }
 
-    async activateAccount({
-        email,
-        otp_type,
-    }: ActivateAccountInput): Promise<void> {
+    async activateAccount({ email }: ActivateAccountInput): Promise<void> {
         await this.dataSource.transaction(async (entityManager) => {
             await entityManager.query(
                 'UPDATE "user" SET is_verified = $1 WHERE email = $2',
@@ -114,7 +112,7 @@ export class AuthService {
                     "otp"."type"::text = $1::text
                 AND
                     "user"."email" = $2;`,
-                [otp_type, email],
+                [otp_type_enum.register_user, email],
             );
         });
     }
