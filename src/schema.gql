@@ -7,9 +7,23 @@ input ActivateAccountInput {
   otp: String!
 }
 
+type AggregateOutput {
+  count: Float!
+}
+
 input ChangePasswordInput {
   new_password: String!
   password: String!
+}
+
+type Chat {
+  chat_type: String!
+  created_at: DateTime!
+  description: String!
+  id: String!
+  name: String!
+  profile: String!
+  updated_at: DateTime
 }
 
 input CreateChatInput {
@@ -19,6 +33,11 @@ input CreateChatInput {
   name: String!
   profile: String!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 input DeleteChatInput {
   id: String!
@@ -30,6 +49,17 @@ input ForgotPasswordInput {
 
 type GenericResult {
   message: String!
+}
+
+input GetChatInput {
+  limit: Float = 20
+  offset: Float = 0
+  where: findChatWhere
+}
+
+type GetChatOutput {
+  chats: [Chat!]!
+  chats_aggregate: AggregateOutput!
 }
 
 type LoginOutput {
@@ -55,6 +85,7 @@ type Mutation {
 
 type Query {
   findUser: String!
+  getChats(object: GetChatInput!): GetChatOutput!
   login(object: LoginUserInput!): LoginOutput!
 }
 
@@ -84,4 +115,18 @@ input UpdateChatInput {
 enum chat_type_enum {
   direct_message
   group
+}
+
+input findChatWhere {
+  id: id_comparison_exp
+  name: string_comparison_exp
+}
+
+input id_comparison_exp {
+  _eq: String!
+}
+
+input string_comparison_exp {
+  _eq: String
+  _ilike: String
 }

@@ -12,7 +12,6 @@ export class CommonEntity {
     @Column({ type: 'timestamp', nullable: true })
     updated_at?: Date;
 
-    @Field({ nullable: true })
     @Column({ type: 'timestamp', nullable: true })
     deleted_at?: Date;
 }

@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ChatsService } from './chats.service';
 import { Chat } from './entities/chat.entity';
 import { CreateChatInput } from './dto/create-chat.input';
@@ -7,10 +7,17 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { IPayload } from 'src/auth/auth.interfaces';
 import { UpdateChatInput } from './dto/update-chat-input';
 import { DeleteChatInput } from './dto/delete-chat-input';
+import { GetChatInput } from './dto/get-chat.input';
+import { GetChatOutput } from './dto/get-chat.output';
 
 @Resolver(() => Chat)
 export class ChatsResolver {
     constructor(private readonly chatsService: ChatsService) {}
+
+    @Query(() => GetChatOutput)
+    async getChats(@Args('object') getChatInput: GetChatInput) {
+        return await this.chatsService.getChats(getChatInput);
+    }
 
     @Mutation(() => GenericResult)
     async createChat(

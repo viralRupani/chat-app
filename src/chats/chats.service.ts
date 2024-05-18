@@ -14,10 +14,52 @@ import { Message } from 'src/common/constants';
 import { IPayload } from 'src/auth/auth.interfaces';
 import { UpdateChatInput } from './dto/update-chat-input';
 import { DeleteChatInput } from './dto/delete-chat-input';
+import { GetChatInput } from './dto/get-chat.input';
+import { GetChatOutput } from './dto/get-chat.output';
 
 @Injectable()
 export class ChatsService {
     constructor(private readonly dataSource: DataSource) {}
+
+    async getChats(getChatInput: GetChatInput): Promise<GetChatOutput> {
+        const { offset, limit, where } = getChatInput;
+
+        const queryBuilder = this.dataSource
+            .getRepository(Chat)
+            .createQueryBuilder('chat')
+            .offset(offset)
+            .limit(limit);
+
+        if (where) {
+            const { id, name } = where;
+            if (id) {
+                const { _eq } = id;
+                if (_eq) {
+                    queryBuilder.andWhere('id = :id', { id: _eq });
+                }
+            }
+
+            if (name) {
+                const { _eq, _ilike } = name;
+                if (_eq) {
+                    queryBuilder.andWhere('name = :name', { name: _eq });
+                } else if (_ilike) {
+                    queryBuilder.andWhere('name ILIKE :name', {
+                        name: _ilike,
+                    });
+                }
+            }
+        }
+
+        const [chats, count] = await queryBuilder.getManyAndCount();
+
+        return {
+            chats,
+            chats_aggregate: {
+                count,
+            },
+        };
+    }
 
     async createChat(
         createChatInput: CreateChatInput,
