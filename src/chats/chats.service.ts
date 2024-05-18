@@ -28,7 +28,8 @@ export class ChatsService {
             .getRepository(Chat)
             .createQueryBuilder('chat')
             .offset(offset)
-            .limit(limit);
+            .limit(limit)
+            .where('deleted_at IS NULL');
 
         if (where) {
             const { id, name } = where;
