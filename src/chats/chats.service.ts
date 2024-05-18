@@ -12,6 +12,8 @@ import { ChatUserMapping } from './entities/chat_user_mapping.entity';
 import { role_type_enum } from 'src/common/enums';
 import { Message } from 'src/common/constants';
 import { IPayload } from 'src/auth/auth.interfaces';
+import { UpdateChatInput } from './dto/update-chat-input';
+import { DeleteChatInput } from './dto/delete-chat-input';
 
 @Injectable()
 export class ChatsService {
@@ -45,15 +47,19 @@ export class ChatsService {
                         user_id: foundUser.id,
                         role: role_type_enum.admin,
                     },
-                    ...createChatInput.members.map(
-                        (member): ChatUserMapping => {
-                            return {
-                                chat_id: chatId,
-                                created_at: new Date(),
-                                user_id: member,
-                                role: role_type_enum.member,
-                            };
+                    ...createChatInput.members.reduce(
+                        (acc: ChatUserMapping[], cur: string) => {
+                            if (cur !== foundUser.id) {
+                                acc.push({
+                                    chat_id: chatId,
+                                    created_at: new Date(),
+                                    user_id: cur,
+                                    role: role_type_enum.member,
+                                });
+                            }
+                            return acc;
                         },
+                        [],
                     ),
                 ]);
             });
@@ -69,5 +75,36 @@ export class ChatsService {
                 );
             }
         }
+    }
+
+    async updateChat(updateChatInput: UpdateChatInput): Promise<GenericResult> {
+        const { id, ...rest } = updateChatInput;
+
+        await this.dataSource
+            .createQueryBuilder()
+            .update(Chat)
+            .set({ ...rest, updated_at: new Date() } as Chat)
+            .where('id = :id', { id })
+            .andWhere('deleted_at IS NULL')
+            .execute();
+
+        return {
+            message: Message.CHAT_UPDATED,
+        };
+    }
+
+    async deleteChat({ id }: DeleteChatInput): Promise<GenericResult> {
+        await this.dataSource.query(
+            `
+        UPDATE chat
+        SET deleted_at = $1
+        WHERE id = $2 AND deleted_at IS NULL
+        `,
+            [new Date(), id],
+        );
+
+        return {
+            message: Message.CHAT_DELETED,
+        };
     }
 }

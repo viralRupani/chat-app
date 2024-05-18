@@ -20,6 +20,10 @@ input CreateChatInput {
   profile: String!
 }
 
+input DeleteChatInput {
+  id: String!
+}
+
 input ForgotPasswordInput {
   email: String!
 }
@@ -42,9 +46,11 @@ type Mutation {
   activateAccount(object: ActivateAccountInput!): GenericResult!
   changePassword(object: ChangePasswordInput!): GenericResult!
   createChat(object: CreateChatInput!): GenericResult!
+  deleteChat(object: DeleteChatInput!): GenericResult!
   forgotPassword(object: ForgotPasswordInput!): GenericResult!
   register(object: RegisterUserInput!): GenericResult!
   resetPassword(object: ResetPasswordInput!): GenericResult!
+  updateChat(object: UpdateChatInput!): GenericResult!
 }
 
 type Query {
@@ -64,6 +70,15 @@ input ResetPasswordInput {
   email: String!
   otp: String!
   password: String!
+}
+
+input UpdateChatInput {
+  chat_type: chat_type_enum
+  description: String
+  id: String!
+  members: [String!]
+  name: String
+  profile: String
 }
 
 enum chat_type_enum {
