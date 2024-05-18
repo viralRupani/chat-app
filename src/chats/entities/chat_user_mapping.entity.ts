@@ -7,10 +7,10 @@ import { CommonEntity } from 'src/common/common-entities/common.entity';
 @Entity()
 export class ChatUserMapping extends CommonEntity {
     @PrimaryColumn()
-    user_id: number;
+    user_id: string;
 
     @PrimaryColumn()
-    chat_id: number;
+    chat_id: string;
 
     @ManyToOne(() => User, {
         onDelete: 'CASCADE',

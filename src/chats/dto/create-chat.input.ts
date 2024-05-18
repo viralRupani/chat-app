@@ -1,5 +1,5 @@
-import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsNotEmpty, MaxLength } from 'class-validator';
+import { Field, InputType } from '@nestjs/graphql';
+import { IsNotEmpty, IsString, IsUUID, MaxLength } from 'class-validator';
 import { chat_type_enum } from 'src/common/enums';
 
 @InputType()
@@ -9,15 +9,18 @@ export class CreateChatInput {
     name: string;
 
     @Field({ nullable: true })
+    @IsString()
     @MaxLength(200)
     description: string;
 
     @Field()
+    @IsString()
     profile: string;
 
     @Field(() => chat_type_enum)
     chat_type: chat_type_enum;
 
-    @Field(() => [Int])
-    members: number[];
+    @Field(() => [String])
+    @IsUUID('all', { each: true })
+    members: string[];
 }

@@ -14,9 +14,9 @@ import { ChatUserMapping } from './chat_user_mapping.entity';
 @Entity()
 @ObjectType()
 export class Chat extends CommonEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     @Field()
-    id?: number;
+    id?: string;
 
     @Column({ type: 'varchar', length: 50 })
     @Field()

@@ -35,22 +35,27 @@ export class ChatsService {
                         created_by: foundUser,
                     },
                 ]);
-                const chatId: number = response.identifiers[0]?.id;
 
-                await entityManager.insert(
-                    ChatUserMapping,
-                    createChatInput.members.map((member): ChatUserMapping => {
-                        return {
-                            chat_id: chatId,
-                            created_at: new Date(),
-                            user_id: member,
-                            role:
-                                member === foundUser.id
-                                    ? role_type_enum.admin
-                                    : role_type_enum.member,
-                        };
-                    }),
-                );
+                const chatId: string = response.identifiers[0]?.id;
+
+                await entityManager.insert(ChatUserMapping, [
+                    {
+                        chat_id: chatId,
+                        created_at: new Date(),
+                        user_id: foundUser.id,
+                        role: role_type_enum.admin,
+                    },
+                    ...createChatInput.members.map(
+                        (member): ChatUserMapping => {
+                            return {
+                                chat_id: chatId,
+                                created_at: new Date(),
+                                user_id: member,
+                                role: role_type_enum.member,
+                            };
+                        },
+                    ),
+                ]);
             });
             return {
                 message: Message.CHAT_CREATED,

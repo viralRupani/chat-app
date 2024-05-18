@@ -16,7 +16,7 @@ input ChangePasswordInput {
 input CreateChatInput {
   chat_type: chat_type_enum!
   description: String
-  members: [Int!]!
+  members: [String!]!
   name: String!
   profile: String!
 }

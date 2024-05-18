@@ -8,8 +8,8 @@ import { ChatUserMapping } from 'src/chats/entities/chat_user_mapping.entity';
 @Entity()
 export class User extends CommonEntity {
     @Field(() => Int)
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Field(() => String)
     @Column()
