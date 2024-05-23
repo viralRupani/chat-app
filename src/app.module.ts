@@ -14,6 +14,7 @@ import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
 import { HealthModule } from './health/health.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ChatsModule } from './chats/chats.module';
+import { MessagesModule } from './messages/messages.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -59,6 +60,7 @@ import configuration from './config/configuration';
         UsersModule,
         HealthModule,
         ChatsModule,
+        MessagesModule,
     ],
     controllers: [AppController],
     providers: [

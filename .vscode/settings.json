@@ -4,6 +4,7 @@
         "datasource",
         "ilike",
         "otps",
-        "viralrupani"
+        "viralrupani",
+        "websockets"
     ]
 }

@@ -3,6 +3,7 @@ import { CommonEntity } from 'src/common/common-entities/common.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Otp } from '../../otp/entities/otp.entity';
 import { ChatUserMapping } from 'src/chats/entities/chat_user_mapping.entity';
+import { Message } from 'src/messages/entities/message.entity';
 
 @ObjectType()
 @Entity()
@@ -40,4 +41,7 @@ export class User extends CommonEntity {
 
     @OneToMany(() => ChatUserMapping, (ChatUserMapping) => ChatUserMapping.user)
     chat_user_mapping: ChatUserMapping[];
+
+    @OneToMany(() => Message, (message) => message.created_by)
+    messages: Message;
 }
