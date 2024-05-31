@@ -3,8 +3,8 @@ import { CommonEntity } from 'src/common/common-entities/common.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
-export class Message extends CommonEntity {
+@Entity('message')
+export class MessageEntity extends CommonEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

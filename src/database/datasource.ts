@@ -11,10 +11,10 @@ const dataSourceOptions: DataSourceOptions = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    synchronize: Boolean(process.env.DB_SYNC),
+    synchronize: Boolean(process.env.DB_SYNC) ?? false,
     entities: ['dist/*/entities/*.entity.js'],
     migrations: ['dist/database/migrations/*js'],
-    logging: Boolean(process.env.DB_LOGGING),
+    logging: Boolean(process.env.DB_LOGGING) ?? false,
 };
 
 export default new DataSource(dataSourceOptions);

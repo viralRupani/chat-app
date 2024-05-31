@@ -16,4 +16,7 @@ export enum Message {
     CHAT_UPDATED = 'Chat updated successfully',
     CHAT_DELETED = 'Chat Deleted successfully',
     UNAUTHORIZED_OPERATION = 'You are unauthorized to perform this operation',
+    MESSAGE_SOURCE_NOT_FOUND = 'Either user or chat does not exist.',
+    ACCESS_DENIED = 'You have no permission to perform this action',
+    MESSAGE_CREATED = 'Message created.',
 }

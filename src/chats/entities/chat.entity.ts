@@ -10,7 +10,7 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ChatUserMapping } from './chat_user_mapping.entity';
-import { Message } from 'src/messages/entities/message.entity';
+import { MessageEntity } from 'src/messages/entities/message.entity';
 
 @Entity()
 @ObjectType()
@@ -45,6 +45,6 @@ export class Chat extends CommonEntity {
     @OneToMany(() => ChatUserMapping, (chatUserMapping) => chatUserMapping.chat)
     chat_user_mapping: ChatUserMapping[];
 
-    @OneToMany(() => Message, (message) => message.chat)
-    messages: Message;
+    @OneToMany(() => MessageEntity, (message) => message.chat)
+    messages: MessageEntity;
 }

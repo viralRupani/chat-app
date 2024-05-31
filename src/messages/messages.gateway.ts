@@ -3,10 +3,11 @@ import {
     SubscribeMessage,
     MessageBody,
     WebSocketServer,
+    WsResponse,
+    WsException,
 } from '@nestjs/websockets';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.input';
-import { UpdateMessageDto } from './dto/update-message.input';
 import { Server } from 'net';
 
 @WebSocketGateway()
@@ -15,30 +16,16 @@ export class MessagesGateway {
 
     constructor(private readonly messagesService: MessagesService) {}
 
-    @SubscribeMessage('createMessage')
-    create(@MessageBody() createMessageDto: CreateMessageDto) {
-        return this.messagesService.create(createMessageDto);
-    }
-
-    @SubscribeMessage('findAllMessages')
-    findAll() {
-        return this.messagesService.findAll();
-    }
-    @SubscribeMessage('findOneMessage')
-    findOne(@MessageBody() id: number) {
-        return this.messagesService.findOne(id);
-    }
-
-    @SubscribeMessage('updateMessage')
-    update(@MessageBody() updateMessageDto: UpdateMessageDto) {
-        return this.messagesService.update(
-            updateMessageDto.id,
-            updateMessageDto,
-        );
-    }
-
-    @SubscribeMessage('removeMessage')
-    remove(@MessageBody() id: number) {
-        return this.messagesService.remove(id);
+    @SubscribeMessage('message:create')
+    async create(
+        @MessageBody() createMessageDto: CreateMessageDto,
+    ): Promise<WsResponse<unknown>> {
+        //todo: dto not validating
+        try {
+            await this.messagesService.create(createMessageDto);
+            return { event: 'message:create', data: createMessageDto };
+        } catch (error) {
+            throw new WsException(error);
+        }
     }
 }
